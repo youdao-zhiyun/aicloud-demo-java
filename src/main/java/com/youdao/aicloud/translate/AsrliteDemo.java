@@ -10,6 +10,10 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 网易有道智云实时语音识别服务api调用demo
+ * api接口: wss://openapi.youdao.com/stream_asropenapi
+ */
 public class AsrliteDemo {
 
     private static final String APP_KEY = "";     // 您的应用ID
