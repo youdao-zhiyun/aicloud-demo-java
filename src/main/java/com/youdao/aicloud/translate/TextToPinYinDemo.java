@@ -1,25 +1,22 @@
 package com.youdao.aicloud.translate;
 
 import com.youdao.aicloud.translate.utils.AuthV3Util;
-import com.youdao.aicloud.translate.utils.FileUtil;
 import com.youdao.aicloud.translate.utils.HttpUtil;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 网易有道智云语音合成服务api调用demo
- * api接口: https://openapi.youdao.com/ttsapi
+ * 网易有道智云文本转拼音服务api调用demo
+ * api接口: https://openapi.youdao.com/getPinYin
  */
-public class TtsDemo {
+public class TextToPinYinDemo {
 
     private static final String APP_KEY = "";     // 您的应用ID
     private static final String APP_SECRET = "";  // 您的应用密钥
-
-    // 合成音频保存路径, 例windows路径：PATH = "C:\\tts\\media.mp3";
-    private static final String PATH = "";
 
     public static void main(String[] args) throws NoSuchAlgorithmException, IOException {
         // 添加请求参数
@@ -27,11 +24,10 @@ public class TtsDemo {
         // 添加鉴权相关参数
         AuthV3Util.addAuthParams(APP_KEY, APP_SECRET, params);
         // 请求api服务
-        byte[] result = HttpUtil.doPost("https://openapi.youdao.com/ttsapi", null, params, "audio");
+        byte[] result = HttpUtil.doPost("https://openapi.youdao.com/getPinYin", null, params, "application/json");
         // 打印返回结果
         if (result != null) {
-            String path = FileUtil.saveFile(PATH, result, false);
-            System.out.println("save path:" + path);
+            System.out.println(new String(result, StandardCharsets.UTF_8));
         }
         System.exit(1);
     }
@@ -40,14 +36,10 @@ public class TtsDemo {
         /*
          * note: 将下列变量替换为需要请求的参数
          */
-        String q = "待合成文本";
-        String voiceName = "发言人名称";
-        String format = "mp3";
+        String q = "待获取拼音的文本";
 
         return new HashMap<String, String[]>() {{
             put("q", new String[]{q});
-            put("voiceName", new String[]{voiceName});
-            put("format", new String[]{format});
         }};
     }
 }
