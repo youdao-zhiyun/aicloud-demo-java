@@ -2,11 +2,15 @@ package com.youdao.aicloud.translate.utils;
 
 import okhttp3.FormBody;
 import okhttp3.HttpUrl;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
@@ -99,5 +103,31 @@ public class HttpUtil {
             System.out.println("request exec error: " + ioException.getMessage());
         }
         return null;
+    }
+
+    public static byte[] doPost(String url, Map<String, String[]> header, Map<String, String[]> body, String parameterName, File file, String expectContentType) {
+        MultipartBody.Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM);
+        addFile(builder, parameterName, file);
+        addBodyParam(builder, body);
+        Request request = new Request.Builder().url(url).post(builder.build()).build();
+        return requestExec(request, expectContentType);
+    }
+
+    private static void addFile(MultipartBody.Builder builder, String parameterName, File file) {
+        builder.addFormDataPart(parameterName, file.getName(), RequestBody.create(MediaType.parse("multipart/form-data"), file));
+    }
+
+    private static void addBodyParam(MultipartBody.Builder builder, Map<String, String[]> body) {
+        if (body == null) {
+            return;
+        }
+        for (String key : body.keySet()) {
+            String[] values = body.get(key);
+            if (values != null) {
+                for (String value : values) {
+                    builder.addFormDataPart(key, value);
+                }
+            }
+        }
     }
 }
