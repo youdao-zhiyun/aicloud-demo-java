@@ -34,6 +34,13 @@ public class HttpUtil {
         return requestExec(builder.build(), expectContentType);
     }
 
+    public static byte[] doPost(String url, Map<String, String[]> header, String params, String expectContentType) {
+        Request.Builder builder = new Request.Builder().url(url);
+        addHeader(builder, header);
+        addBodyParam(builder, params, "POST");
+        return requestExec(builder.build(), expectContentType);
+    }
+
     private static void addHeader(Request.Builder builder, Map<String, String[]> header) {
         if (header == null) {
             return;
@@ -78,6 +85,15 @@ public class HttpUtil {
             }
         }
         builder.method(method, formBodyBuilder.build());
+    }
+
+    private static void addBodyParam(Request.Builder builder, String params, String method) {
+        if (method == null) {
+            return;
+        }
+        MediaType JSON = MediaType.parse("application/json;charset=utf-8");
+        RequestBody requestBody = RequestBody.create(JSON, params);
+        builder.method(method, requestBody);
     }
 
     private static byte[] requestExec(Request request, String expectContentType) {

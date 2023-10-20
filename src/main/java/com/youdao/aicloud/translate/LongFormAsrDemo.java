@@ -10,6 +10,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,7 +36,7 @@ public class LongFormAsrDemo {
 
         // 1、 预处理
         String taskId = prepareHelper(file);
-        if(null == taskId) {
+        if (null == taskId) {
             System.out.println("预处理失败");
             System.exit(1);
         }
@@ -45,12 +47,14 @@ public class LongFormAsrDemo {
             byte[] slice = new byte[SLICE_SIZE];
             int len = 0;
             int sliceId = 1;
-            while((len = fileInputStream.read(slice)) > 0) {
-                FileOutputStream fos = new FileOutputStream("D:\\" + sliceId + ".wav");
+            while ((len = fileInputStream.read(slice)) > 0) {
+                String sliceFilePath = "D:\\longFormAsrDemo-" + System.currentTimeMillis() + "-" + sliceId + ".wav";
+                FileOutputStream fos = new FileOutputStream(sliceFilePath);
                 fos.write(slice, 0, len);
                 fos.close();
-                String uploadErrorCode = uploadHelper(taskId, sliceId, new File("D:\\" + sliceId + ".wav"));
-                if(!"0".equals(uploadErrorCode)) {
+                String uploadErrorCode = uploadHelper(taskId, sliceId, new File(sliceFilePath));
+                Files.deleteIfExists(Paths.get(sliceFilePath));
+                if (!"0".equals(uploadErrorCode)) {
                     System.exit(1);
                 }
                 System.out.println("分片" + sliceId + "上传成功");

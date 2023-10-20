@@ -2,6 +2,7 @@ package com.youdao.aicloud.translate.utils;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -37,6 +38,28 @@ public class AuthV3Util {
         paramsMap.put("curtime", new String[]{curtime});
         paramsMap.put("signType", new String[]{"v3"});
         paramsMap.put("sign", new String[]{sign});
+    }
+
+    /**
+     * 添加鉴权相关参数 -
+     *
+     * @param appKey
+     * @param appSecret
+     * @param q         用于生成签名的字段
+     * @return
+     * @throws NoSuchAlgorithmException
+     */
+    public static Map<String, Object> addAuthParams(String appKey, String appSecret, String q) throws NoSuchAlgorithmException {
+        String salt = UUID.randomUUID().toString();
+        String curtime = String.valueOf(System.currentTimeMillis() / 1000);
+        String sign = calculateSign(appKey, appSecret, q, salt, curtime);
+        return new HashMap<String, Object>() {{
+            put("appKey", appKey);
+            put("salt", salt);
+            put("curtime", curtime);
+            put("signType", "v3");
+            put("sign", sign);
+        }};
     }
 
     /**
