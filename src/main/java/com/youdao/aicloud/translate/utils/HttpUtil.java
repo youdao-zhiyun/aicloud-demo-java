@@ -114,6 +114,7 @@ public class HttpUtil {
                 System.out.println("response body is null");
             } else {
                 System.out.println("request failed, http code: " + response.code());
+                return response.body() == null ? null : response.body().bytes();
             }
         } catch (IOException ioException) {
             System.out.println("request exec error: " + ioException.getMessage());
