@@ -1,9 +1,11 @@
 package com.youdao.aicloud.translate;
 
+import okhttp3.Response;
+import okhttp3.sse.EventSource;
+import okhttp3.sse.EventSourceListener;
 import com.youdao.aicloud.translate.utils.AuthV3Util;
 import com.youdao.aicloud.translate.utils.HttpUtil;
 
-import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,13 +24,31 @@ public class LLMTransDemo {
         Map<String, String[]> params = createRequestParams();
         // 添加鉴权相关参数
         AuthV3Util.addAuthParams(APP_KEY, APP_SECRET, params);
-        // 请求api服务
-        byte[] result = HttpUtil.doPost("https://openapi.youdao.com/llm_trans", null, params, "application/json");
-        // 打印返回结果
-        if (result != null) {
-            System.out.println(new String(result, StandardCharsets.UTF_8));
-        }
-        System.exit(1);
+
+        EventSourceListener listener = new EventSourceListener() {
+            @Override
+            public void onOpen(EventSource eventSource, Response response) {
+                System.out.println("建立连接成功：");
+            }
+
+            @Override
+            public void onEvent(EventSource eventSource, String id, String type, String data) {
+                System.out.println(data);
+            }
+
+            @Override
+            public void onClosed(EventSource eventSource) {
+                System.out.println("连接关闭");
+                System.exit(1);
+            }
+
+            @Override
+            public void onFailure(EventSource eventSource, Throwable t, Response response) {
+                System.out.println("连接失败");
+                System.exit(1);
+            }
+        };
+        HttpUtil.doPost("https://openapi.youdao.com/llm_trans", null, params, listener);
     }
 
     private static Map<String, String[]> createRequestParams() {
