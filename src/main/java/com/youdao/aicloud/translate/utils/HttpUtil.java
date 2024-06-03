@@ -9,6 +9,9 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
+import okhttp3.sse.EventSource;
+import okhttp3.sse.EventSourceListener;
+import okhttp3.sse.EventSources;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,6 +42,13 @@ public class HttpUtil {
         addHeader(builder, header);
         addBodyParam(builder, params, "POST");
         return requestExec(builder.build(), expectContentType);
+    }
+
+    public static void doPost(String url, Map<String, String[]> header, Map<String, String[]> body, EventSourceListener listener) {
+        Request.Builder builder = new Request.Builder().url(url);
+        addHeader(builder, header);
+        addBodyParam(builder, body, "POST");
+        requestExec(builder.build(), listener);
     }
 
     private static void addHeader(Request.Builder builder, Map<String, String[]> header) {
@@ -94,6 +104,12 @@ public class HttpUtil {
         MediaType JSON = MediaType.parse("application/json;charset=utf-8");
         RequestBody requestBody = RequestBody.create(JSON, params);
         builder.method(method, requestBody);
+    }
+
+    private static void requestExec(Request request, EventSourceListener listener) {
+        OkHttpClient client = new OkHttpClient().newBuilder().build();
+        EventSource.Factory factory = EventSources.createFactory(client);
+        factory.newEventSource(request, listener);
     }
 
     private static byte[] requestExec(Request request, String expectContentType) {
