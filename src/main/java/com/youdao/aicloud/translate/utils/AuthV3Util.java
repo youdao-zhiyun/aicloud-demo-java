@@ -41,6 +41,30 @@ public class AuthV3Util {
     }
 
     /**
+     * 添加小P老师服务鉴权相关参数 (参数名为下划线格式)-
+     * appKey : 应用ID
+     * salt : 随机值
+     * curtime : 当前时间戳(秒)
+     * signType : 签名版本
+     * sign : 请求签名
+     *
+     * @param appKey    您的应用ID
+     * @param appSecret 您的应用密钥
+     * @param paramsMap 请求参数表
+     */
+    public static void addXiaopAuthParams(String appKey, String appSecret, Map<String, String[]> paramsMap)
+        throws NoSuchAlgorithmException {
+        String salt = UUID.randomUUID().toString();
+        String curtime = String.valueOf(System.currentTimeMillis() / 1000);
+        String sign = calculateSign(appKey, appSecret, curtime, salt, curtime);
+        paramsMap.put("app_key", new String[]{appKey});
+        paramsMap.put("salt", new String[]{salt});
+        paramsMap.put("curtime", new String[]{curtime});
+        paramsMap.put("sign_type", new String[]{"v3"});
+        paramsMap.put("sign", new String[]{sign});
+    }
+
+    /**
      * 添加鉴权相关参数 -
      *
      * @param appKey
